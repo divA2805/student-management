@@ -16,22 +16,17 @@ export async function getStudents(): Promise<Student[]> {
   }
 }
 
-export async function getStudentById(
-  id: number
-): Promise<Student | undefined> {
+export async function getStudentById(id: number): Promise<Student | undefined> {
   const students = await getStudents();
 
   return students.find((student) => student.id === id);
 }
 
-export async function createStudent(
-  data: StudentInput
-): Promise<Student> {
+export async function createStudent(data: StudentInput): Promise<Student> {
   const students = await getStudents();
 
   const newStudent: Student = {
-    id: Date.now(),
-    ...data,
+    id: Date.now(), ...data,
   };
 
   students.push(newStudent);
@@ -44,10 +39,7 @@ export async function createStudent(
   return newStudent;
 }
 
-export async function updateStudent(
-  id: number,
-  data: StudentInput
-): Promise<Student> {
+export async function updateStudent(id: number,data: StudentInput): Promise<Student> {
   const students = await getStudents();
 
   const studentIndex = students.findIndex(
