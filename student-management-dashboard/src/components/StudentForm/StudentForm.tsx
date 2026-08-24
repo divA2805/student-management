@@ -1,10 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import {
     Box,
     Button,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select,
     Step,
     StepLabel,
     Stepper,
@@ -16,92 +19,73 @@ import { Formik, FormikErrors } from "formik";
 import * as Yup from "yup";
 
 import { StudentInput } from "@/types/student";
-import { useStudents } from "@/hooks/useStudents";
 
 const steps = [
     "Personal Information",
     "Course Information",
-    "Confirmation",
+    "Performance & Confirmation",
 ];
 
-const initialValues: StudentInput = {
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    dateOfBirth: "",
-    course: "",
-    batch: "",
-    startDate: "",
-    trainer: "",
-    experience: "",
-};
+interface StudentFormProps {
+    initialValues: StudentInput;
+    onSubmit: (values: StudentInput) => Promise<void>;
+}
 
-const personalValidationSchema = Yup.object({
-    firstName: Yup.string()
-        .required("First name is required"),
-
-    lastName: Yup.string()
-        .required("Last name is required"),
-
+const personalSchema = Yup.object({
+    firstName: Yup.string().required("First name is required"),
+    lastName: Yup.string().required("Last name is required"),
     email: Yup.string()
-        .email("Invalid email format")
+        .email("Invalid email")
         .required("Email is required"),
-
     phone: Yup.string()
-        .matches(/^[0-9]{10}$/, "Phone must be exactly 10 digits").required("Phone is required"),
-
-    dateOfBirth: Yup.string()
-        .required("Date of birth is required"),
+        .matches(/^[0-9]{10}$/, "Phone must be exactly 10 digits")
+        .required("Phone is required"),
+    dateOfBirth: Yup.string().required("Date of birth is required"),
 });
 
-const courseValidationSchema = Yup.object({
-    course: Yup.string()
-        .required("Course is required"),
-
-    batch: Yup.string()
-        .required("Batch is required"),
-
-    startDate: Yup.string()
-        .required("Start date is required"),
-
-    trainer: Yup.string()
-        .required("Trainer is required"),
-
-    experience: Yup.string()
-        .required("Experience is required"),
+const courseSchema = Yup.object({
+    course: Yup.string().required("Course is required"),
+    batch: Yup.string().required("Batch is required"),
+    startDate: Yup.string().required("Start date is required"),
+    trainer: Yup.string().required("Trainer is required"),
+    experience: Yup.string().required("Experience is required"),
 });
 
-export default function StudentForm() {
+const performanceSchema = Yup.object({
+    status: Yup.string()
+        .oneOf(["Active", "Completed", "Inactive"])
+        .required("Status is required"),
+
+    score: Yup.number()
+        .typeError("Score must be a number")
+        .min(0, "Score cannot be below 0")
+        .max(100, "Score cannot exceed 100")
+        .required("Score is required"),
+
+    pendingAssignments: Yup.number()
+        .typeError("Must be a number")
+        .integer("Must be a whole number")
+        .min(0, "Cannot be negative")
+        .required("Pending assignments is required"),
+});
+
+export default function StudentForm({
+    initialValues,
+    onSubmit,
+}: StudentFormProps) {
     const [activeStep, setActiveStep] = useState(0);
-
-    const router = useRouter();
-
-    const { addStudent } = useStudents();
-
-    async function handleSubmit(
-        values: StudentInput
-    ) {
-        try {
-            await addStudent(values);
-
-            router.push("/students");
-        } catch (error) {
-            console.error("Failed to create student:", error);
-        }
-    }
 
     return (
         <Formik
             initialValues={initialValues}
             validationSchema={
                 activeStep === 0
-                    ? personalValidationSchema
+                    ? personalSchema
                     : activeStep === 1
-                        ? courseValidationSchema
-                        : undefined
+                        ? courseSchema
+                        : performanceSchema
             }
-            onSubmit={handleSubmit}
+            onSubmit={onSubmit}
         >
             {(formik) => {
                 const {
@@ -119,34 +103,19 @@ export default function StudentForm() {
                         await validateForm();
 
                     if (activeStep === 0) {
-                        const stepErrors: FormikErrors<StudentInput> = {};
+                        const fields = [
+                            "firstName",
+                            "lastName",
+                            "email",
+                            "phone",
+                            "dateOfBirth",
+                        ] as const;
 
-                        if (validationErrors.firstName) {
-                            stepErrors.firstName =
-                                validationErrors.firstName;
-                        }
+                        const hasErrors = fields.some(
+                            (field) => validationErrors[field]
+                        );
 
-                        if (validationErrors.lastName) {
-                            stepErrors.lastName =
-                                validationErrors.lastName;
-                        }
-
-                        if (validationErrors.email) {
-                            stepErrors.email =
-                                validationErrors.email;
-                        }
-
-                        if (validationErrors.phone) {
-                            stepErrors.phone =
-                                validationErrors.phone;
-                        }
-
-                        if (validationErrors.dateOfBirth) {
-                            stepErrors.dateOfBirth =
-                                validationErrors.dateOfBirth;
-                        }
-
-                        if (Object.keys(stepErrors).length > 0) {
+                        if (hasErrors) {
                             await setTouched({
                                 firstName: true,
                                 lastName: true,
@@ -160,34 +129,19 @@ export default function StudentForm() {
                     }
 
                     if (activeStep === 1) {
-                        const stepErrors: FormikErrors<StudentInput> = {};
+                        const fields = [
+                            "course",
+                            "batch",
+                            "startDate",
+                            "trainer",
+                            "experience",
+                        ] as const;
 
-                        if (validationErrors.course) {
-                            stepErrors.course =
-                                validationErrors.course;
-                        }
+                        const hasErrors = fields.some(
+                            (field) => validationErrors[field]
+                        );
 
-                        if (validationErrors.batch) {
-                            stepErrors.batch =
-                                validationErrors.batch;
-                        }
-
-                        if (validationErrors.startDate) {
-                            stepErrors.startDate =
-                                validationErrors.startDate;
-                        }
-
-                        if (validationErrors.trainer) {
-                            stepErrors.trainer =
-                                validationErrors.trainer;
-                        }
-
-                        if (validationErrors.experience) {
-                            stepErrors.experience =
-                                validationErrors.experience;
-                        }
-
-                        if (Object.keys(stepErrors).length > 0) {
+                        if (hasErrors) {
                             await setTouched({
                                 course: true,
                                 batch: true,
@@ -203,23 +157,18 @@ export default function StudentForm() {
                     setActiveStep((prev) => prev + 1);
                 }
 
-                function handleBack() {
-                    setActiveStep((prev) => prev - 1);
-                }
-
                 return (
                     <Box sx={{ width: "100%", mt: 4 }}>
                         <Stepper activeStep={activeStep}>
-                            {steps.map((label) => (
-                                <Step key={label}>
-                                    <StepLabel>
-                                        {label}
-                                    </StepLabel>
+                            {steps.map((step) => (
+                                <Step key={step}>
+                                    <StepLabel>{step}</StepLabel>
                                 </Step>
                             ))}
                         </Stepper>
 
                         <Box sx={{ mt: 4 }}>
+                            {/* STEP 1 */}
                             {activeStep === 0 && (
                                 <Box>
                                     <Typography
@@ -232,8 +181,10 @@ export default function StudentForm() {
                                     <Box
                                         sx={{
                                             display: "grid",
-                                            gridTemplateColumns:
-                                                "repeat(2, 1fr)",
+                                            gridTemplateColumns: {
+                                                xs: "1fr",
+                                                md: "repeat(2, 1fr)",
+                                            },
                                             gap: 2,
                                         }}
                                     >
@@ -246,9 +197,7 @@ export default function StudentForm() {
                                             onBlur={handleBlur}
                                             error={
                                                 touched.firstName &&
-                                                Boolean(
-                                                    errors.firstName
-                                                )
+                                                Boolean(errors.firstName)
                                             }
                                             helperText={
                                                 touched.firstName &&
@@ -265,9 +214,7 @@ export default function StudentForm() {
                                             onBlur={handleBlur}
                                             error={
                                                 touched.lastName &&
-                                                Boolean(
-                                                    errors.lastName
-                                                )
+                                                Boolean(errors.lastName)
                                             }
                                             helperText={
                                                 touched.lastName &&
@@ -285,9 +232,7 @@ export default function StudentForm() {
                                             onBlur={handleBlur}
                                             error={
                                                 touched.email &&
-                                                Boolean(
-                                                    errors.email
-                                                )
+                                                Boolean(errors.email)
                                             }
                                             helperText={
                                                 touched.email &&
@@ -304,9 +249,7 @@ export default function StudentForm() {
                                             onBlur={handleBlur}
                                             error={
                                                 touched.phone &&
-                                                Boolean(
-                                                    errors.phone
-                                                )
+                                                Boolean(errors.phone)
                                             }
                                             helperText={
                                                 touched.phone &&
@@ -329,9 +272,7 @@ export default function StudentForm() {
                                             }}
                                             error={
                                                 touched.dateOfBirth &&
-                                                Boolean(
-                                                    errors.dateOfBirth
-                                                )
+                                                Boolean(errors.dateOfBirth)
                                             }
                                             helperText={
                                                 touched.dateOfBirth &&
@@ -342,6 +283,7 @@ export default function StudentForm() {
                                 </Box>
                             )}
 
+                            {/* STEP 2 */}
                             {activeStep === 1 && (
                                 <Box>
                                     <Typography
@@ -354,8 +296,10 @@ export default function StudentForm() {
                                     <Box
                                         sx={{
                                             display: "grid",
-                                            gridTemplateColumns:
-                                                "repeat(2, 1fr)",
+                                            gridTemplateColumns: {
+                                                xs: "1fr",
+                                                md: "repeat(2, 1fr)",
+                                            },
                                             gap: 2,
                                         }}
                                     >
@@ -368,9 +312,7 @@ export default function StudentForm() {
                                             onBlur={handleBlur}
                                             error={
                                                 touched.course &&
-                                                Boolean(
-                                                    errors.course
-                                                )
+                                                Boolean(errors.course)
                                             }
                                             helperText={
                                                 touched.course &&
@@ -387,9 +329,7 @@ export default function StudentForm() {
                                             onBlur={handleBlur}
                                             error={
                                                 touched.batch &&
-                                                Boolean(
-                                                    errors.batch
-                                                )
+                                                Boolean(errors.batch)
                                             }
                                             helperText={
                                                 touched.batch &&
@@ -412,9 +352,7 @@ export default function StudentForm() {
                                             }}
                                             error={
                                                 touched.startDate &&
-                                                Boolean(
-                                                    errors.startDate
-                                                )
+                                                Boolean(errors.startDate)
                                             }
                                             helperText={
                                                 touched.startDate &&
@@ -431,9 +369,7 @@ export default function StudentForm() {
                                             onBlur={handleBlur}
                                             error={
                                                 touched.trainer &&
-                                                Boolean(
-                                                    errors.trainer
-                                                )
+                                                Boolean(errors.trainer)
                                             }
                                             helperText={
                                                 touched.trainer &&
@@ -450,9 +386,7 @@ export default function StudentForm() {
                                             onBlur={handleBlur}
                                             error={
                                                 touched.experience &&
-                                                Boolean(
-                                                    errors.experience
-                                                )
+                                                Boolean(errors.experience)
                                             }
                                             helperText={
                                                 touched.experience &&
@@ -463,35 +397,145 @@ export default function StudentForm() {
                                 </Box>
                             )}
 
+                            {/* STEP 3 */}
                             {activeStep === 2 && (
                                 <Box>
                                     <Typography
                                         variant="h6"
                                         sx={{ mb: 3 }}
                                     >
-                                        Confirmation
+                                        Performance & Confirmation
                                     </Typography>
 
-                                    <Box>
+                                    <Box
+                                        sx={{
+                                            display: "grid",
+                                            gridTemplateColumns: {
+                                                xs: "1fr",
+                                                md: "repeat(2, 1fr)",
+                                            },
+                                            gap: 2,
+                                        }}
+                                    >
+                                        <FormControl fullWidth>
+                                            <InputLabel>
+                                                Status
+                                            </InputLabel>
+
+                                            <Select
+                                                name="status"
+                                                value={values.status}
+                                                label="Status"
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                error={
+                                                    touched.status &&
+                                                    Boolean(errors.status)
+                                                }
+                                            >
+                                                <MenuItem value="Active">
+                                                    Active
+                                                </MenuItem>
+                                                <MenuItem value="Completed">
+                                                    Completed
+                                                </MenuItem>
+                                                <MenuItem value="Inactive">
+                                                    Inactive
+                                                </MenuItem>
+                                            </Select>
+                                        </FormControl>
+
+                                        <TextField
+                                            fullWidth
+                                            label="Score"
+                                            name="score"
+                                            type="number"
+                                            value={values.score}
+                                            onChange={(e) =>
+                                                formik.setFieldValue(
+                                                    "score",
+                                                    e.target.value === ""
+                                                        ? ""
+                                                        : Number(e.target.value)
+                                                )
+                                            }
+                                            onBlur={handleBlur}
+                                            slotProps={{
+                                                htmlInput: {
+                                                    min: 0,
+                                                    max: 100,
+                                                },
+                                            }}
+                                            error={
+                                                touched.score &&
+                                                Boolean(errors.score)
+                                            }
+                                            helperText={
+                                                touched.score &&
+                                                errors.score
+                                            }
+                                        />
+
+                                        <TextField
+                                            fullWidth
+                                            label="Pending Assignments"
+                                            name="pendingAssignments"
+                                            type="number"
+                                            value={
+                                                values.pendingAssignments
+                                            }
+                                            onChange={(e) =>
+                                                formik.setFieldValue(
+                                                    "pendingAssignments",
+                                                    e.target.value === ""
+                                                        ? ""
+                                                        : Number(e.target.value)
+                                                )
+                                            }
+                                            onBlur={handleBlur}
+                                            slotProps={{
+                                                htmlInput: {
+                                                    min: 0,
+                                                },
+                                            }}
+                                            error={
+                                                touched.pendingAssignments &&
+                                                Boolean(
+                                                    errors.pendingAssignments
+                                                )
+                                            }
+                                            helperText={
+                                                touched.pendingAssignments &&
+                                                errors.pendingAssignments
+                                            }
+                                        />
+                                    </Box>
+
+                                    <Box
+                                        sx={{
+                                            mt: 4,
+                                            p: 3,
+                                            border:
+                                                "1px solid #e5e7eb",
+                                            borderRadius: 2,
+                                            backgroundColor:
+                                                "#fafafa",
+                                        }}
+                                    >
+                                        <Typography
+                                            variant="subtitle1"
+                                            sx={{
+                                                fontWeight: 600,
+                                                mb: 2,
+                                            }}
+                                        >
+                                            Confirmation
+                                        </Typography>
+
                                         <Typography>
                                             <strong>Name:</strong>{" "}
                                             {values.firstName}{" "}
                                             {values.lastName}
-                                        </Typography>
-
-                                        <Typography>
-                                            <strong>Email:</strong>{" "}
-                                            {values.email}
-                                        </Typography>
-
-                                        <Typography>
-                                            <strong>Phone:</strong>{" "}
-                                            {values.phone}
-                                        </Typography>
-
-                                        <Typography>
-                                            <strong>Date of Birth:</strong>{" "}
-                                            {values.dateOfBirth}
                                         </Typography>
 
                                         <Typography>
@@ -500,23 +544,18 @@ export default function StudentForm() {
                                         </Typography>
 
                                         <Typography>
-                                            <strong>Batch:</strong>{" "}
-                                            {values.batch}
+                                            <strong>Status:</strong>{" "}
+                                            {values.status}
                                         </Typography>
 
                                         <Typography>
-                                            <strong>Start Date:</strong>{" "}
-                                            {values.startDate}
+                                            <strong>Score:</strong>{" "}
+                                            {values.score}
                                         </Typography>
 
                                         <Typography>
-                                            <strong>Trainer:</strong>{" "}
-                                            {values.trainer}
-                                        </Typography>
-
-                                        <Typography>
-                                            <strong>Experience:</strong>{" "}
-                                            {values.experience}
+                                            <strong>Pending Assignments:</strong>{" "}
+                                            {values.pendingAssignments}
                                         </Typography>
                                     </Box>
                                 </Box>
@@ -526,18 +565,24 @@ export default function StudentForm() {
                         <Box
                             sx={{
                                 display: "flex",
-                                justifyContent: "space-between",
+                                justifyContent:
+                                    "space-between",
                                 mt: 4,
                             }}
                         >
                             <Button
                                 disabled={activeStep === 0}
-                                onClick={handleBack}
+                                onClick={() =>
+                                    setActiveStep(
+                                        (prev) => prev - 1
+                                    )
+                                }
                             >
                                 Back
                             </Button>
 
-                            {activeStep < steps.length - 1 ? (
+                            {activeStep <
+                                steps.length - 1 ? (
                                 <Button
                                     variant="contained"
                                     onClick={handleNext}
