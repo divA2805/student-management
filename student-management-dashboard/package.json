@@ -19,6 +19,7 @@
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "react-toastify": "^11.1.0",
+    "recharts": "^3.10.1",
     "yup": "^1.7.1"
   },
   "devDependencies": {
