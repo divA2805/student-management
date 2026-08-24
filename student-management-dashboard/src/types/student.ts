@@ -15,4 +15,6 @@ export interface Student {
   pendingAssignments: number;
 }
 
-export type StudentInput = Omit<Student, "id">;
+export type StudentInput = Omit<
+  Student,
+  "id" | "status" | "score" | "pendingAssignments">;
