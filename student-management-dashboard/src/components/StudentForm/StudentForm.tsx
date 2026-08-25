@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import {
-    Box,
     Button,
     FormControl,
     InputLabel,
@@ -12,10 +11,9 @@ import {
     StepLabel,
     Stepper,
     TextField,
-    Typography,
 } from "@mui/material";
 
-import { Formik, FormikErrors } from "formik";
+import { Formik } from "formik";
 import * as Yup from "yup";
 
 import { StudentInput } from "@/types/student";
@@ -82,8 +80,8 @@ export default function StudentForm({
                 activeStep === 0
                     ? personalSchema
                     : activeStep === 1
-                        ? courseSchema
-                        : performanceSchema
+                    ? courseSchema
+                    : performanceSchema
             }
             onSubmit={onSubmit}
         >
@@ -99,8 +97,7 @@ export default function StudentForm({
                 } = formik;
 
                 async function handleNext() {
-                    const validationErrors =
-                        await validateForm();
+                    const validationErrors = await validateForm();
 
                     if (activeStep === 0) {
                         const fields = [
@@ -123,7 +120,6 @@ export default function StudentForm({
                                 phone: true,
                                 dateOfBirth: true,
                             });
-
                             return;
                         }
                     }
@@ -149,7 +145,6 @@ export default function StudentForm({
                                 trainer: true,
                                 experience: true,
                             });
-
                             return;
                         }
                     }
@@ -158,7 +153,7 @@ export default function StudentForm({
                 }
 
                 return (
-                    <Box sx={{ width: "100%", mt: 4 }}>
+                    <div className="form-wrapper">
                         <Stepper activeStep={activeStep}>
                             {steps.map((step) => (
                                 <Step key={step}>
@@ -167,27 +162,15 @@ export default function StudentForm({
                             ))}
                         </Stepper>
 
-                        <Box sx={{ mt: 4 }}>
+                        <div className="form-content">
                             {/* STEP 1 */}
                             {activeStep === 0 && (
-                                <Box>
-                                    <Typography
-                                        variant="h6"
-                                        sx={{ mb: 3 }}
-                                    >
+                                <div>
+                                    <h2 className="form-section-title">
                                         Personal Information
-                                    </Typography>
+                                    </h2>
 
-                                    <Box
-                                        sx={{
-                                            display: "grid",
-                                            gridTemplateColumns: {
-                                                xs: "1fr",
-                                                md: "repeat(2, 1fr)",
-                                            },
-                                            gap: 2,
-                                        }}
-                                    >
+                                    <div className="form-grid">
                                         <TextField
                                             fullWidth
                                             label="First Name"
@@ -279,30 +262,18 @@ export default function StudentForm({
                                                 errors.dateOfBirth
                                             }
                                         />
-                                    </Box>
-                                </Box>
+                                    </div>
+                                </div>
                             )}
 
                             {/* STEP 2 */}
                             {activeStep === 1 && (
-                                <Box>
-                                    <Typography
-                                        variant="h6"
-                                        sx={{ mb: 3 }}
-                                    >
+                                <div>
+                                    <h2 className="form-section-title">
                                         Course Information
-                                    </Typography>
+                                    </h2>
 
-                                    <Box
-                                        sx={{
-                                            display: "grid",
-                                            gridTemplateColumns: {
-                                                xs: "1fr",
-                                                md: "repeat(2, 1fr)",
-                                            },
-                                            gap: 2,
-                                        }}
-                                    >
+                                    <div className="form-grid">
                                         <TextField
                                             fullWidth
                                             label="Course"
@@ -393,35 +364,20 @@ export default function StudentForm({
                                                 errors.experience
                                             }
                                         />
-                                    </Box>
-                                </Box>
+                                    </div>
+                                </div>
                             )}
 
                             {/* STEP 3 */}
                             {activeStep === 2 && (
-                                <Box>
-                                    <Typography
-                                        variant="h6"
-                                        sx={{ mb: 3 }}
-                                    >
+                                <div>
+                                    <h2 className="form-section-title">
                                         Performance & Confirmation
-                                    </Typography>
+                                    </h2>
 
-                                    <Box
-                                        sx={{
-                                            display: "grid",
-                                            gridTemplateColumns: {
-                                                xs: "1fr",
-                                                md: "repeat(2, 1fr)",
-                                            },
-                                            gap: 2,
-                                        }}
-                                    >
+                                    <div className="form-grid">
                                         <FormControl fullWidth>
-                                            <InputLabel>
-                                                Status
-                                            </InputLabel>
-
+                                            <InputLabel>Status</InputLabel>
                                             <Select
                                                 name="status"
                                                 value={values.status}
@@ -481,9 +437,7 @@ export default function StudentForm({
                                             label="Pending Assignments"
                                             name="pendingAssignments"
                                             type="number"
-                                            value={
-                                                values.pendingAssignments
-                                            }
+                                            value={values.pendingAssignments}
                                             onChange={(e) =>
                                                 formik.setFieldValue(
                                                     "pendingAssignments",
@@ -509,98 +463,72 @@ export default function StudentForm({
                                                 errors.pendingAssignments
                                             }
                                         />
-                                    </Box>
+                                    </div>
 
-                                    <Box
-                                        sx={{
-                                            mt: 4,
-                                            p: 3,
-                                            border:
-                                                "1px solid #e5e7eb",
-                                            borderRadius: 2,
-                                            backgroundColor:
-                                                "#fafafa",
-                                        }}
-                                    >
-                                        <Typography
-                                            variant="subtitle1"
-                                            sx={{
-                                                fontWeight: 600,
-                                                mb: 2,
-                                            }}
-                                        >
-                                            Confirmation
-                                        </Typography>
+                                    <div className="confirmation-card">
+                                        <h3 className="confirmation-title">
+                                            Confirmation Details
+                                        </h3>
 
-                                        <Typography>
-                                            <strong>Name:</strong>{" "}
-                                            {values.firstName}{" "}
-                                            {values.lastName}
-                                        </Typography>
+                                        <div className="confirmation-item">
+                                            <strong>Name:</strong>
+                                            {values.firstName} {values.lastName}
+                                        </div>
 
-                                        <Typography>
-                                            <strong>Course:</strong>{" "}
+                                        <div className="confirmation-item">
+                                            <strong>Course:</strong>
                                             {values.course}
-                                        </Typography>
+                                        </div>
 
-                                        <Typography>
-                                            <strong>Status:</strong>{" "}
+                                        <div className="confirmation-item">
+                                            <strong>Status:</strong>
                                             {values.status}
-                                        </Typography>
+                                        </div>
 
-                                        <Typography>
-                                            <strong>Score:</strong>{" "}
+                                        <div className="confirmation-item">
+                                            <strong>Score:</strong>
                                             {values.score}
-                                        </Typography>
+                                        </div>
 
-                                        <Typography>
-                                            <strong>Pending Assignments:</strong>{" "}
+                                        <div className="confirmation-item">
+                                            <strong>Pending Assignments:</strong>
                                             {values.pendingAssignments}
-                                        </Typography>
-                                    </Box>
-                                </Box>
+                                        </div>
+                                    </div>
+                                </div>
                             )}
-                        </Box>
+                        </div>
 
-                        <Box
-                            sx={{
-                                display: "flex",
-                                justifyContent:
-                                    "space-between",
-                                mt: 4,
-                            }}
-                        >
+                        <div className="form-navigation">
                             <Button
                                 disabled={activeStep === 0}
                                 onClick={() =>
-                                    setActiveStep(
-                                        (prev) => prev - 1
-                                    )
+                                    setActiveStep((prev) => prev - 1)
                                 }
+                                sx={{ textTransform: "none" }}
                             >
                                 Back
                             </Button>
 
-                            {activeStep <
-                                steps.length - 1 ? (
+                            {activeStep < steps.length - 1 ? (
                                 <Button
                                     variant="contained"
                                     onClick={handleNext}
+                                    sx={{ textTransform: "none" }}
                                 >
                                     Next
                                 </Button>
                             ) : (
                                 <Button
                                     variant="contained"
-                                    onClick={() =>
-                                        formik.submitForm()
-                                    }
+                                    onClick={() => formik.submitForm()}
+                                    sx={{ textTransform: "none" }}
                                 >
                                     Submit
                                 </Button>
                             )}
-                        </Box>
-                    </Box>
+                        </div>
+                    </div>
                 );
             }}
         </Formik>

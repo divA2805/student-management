@@ -28,8 +28,10 @@ export default function ConfirmDialog({
         <Dialog
             open={open}
             onClose={onCancel}
+            maxWidth="xs"
+            fullWidth
         >
-            <DialogTitle>
+            <DialogTitle sx={{ fontWeight: 600 }}>
                 {title}
             </DialogTitle>
 
@@ -39,13 +41,10 @@ export default function ConfirmDialog({
                 </DialogContentText>
             </DialogContent>
 
-            <DialogActions>
+            <DialogActions sx={{ px: 3, pb: 2 }}>
                 <Button
                     onClick={onCancel}
-                    sx={{
-                        textTransform:
-                            "none",
-                    }}
+                    sx={{ textTransform: "none" }}
                 >
                     Cancel
                 </Button>
@@ -54,10 +53,7 @@ export default function ConfirmDialog({
                     onClick={onConfirm}
                     color="error"
                     variant="contained"
-                    sx={{
-                        textTransform:
-                            "none",
-                    }}
+                    sx={{ textTransform: "none" }}
                 >
                     Delete
                 </Button>

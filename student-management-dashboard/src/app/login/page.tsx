@@ -2,24 +2,20 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Box, Button, Paper, TextField, Typography } from "@mui/material";
+import { Button, TextField, Typography } from "@mui/material";
 
 import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
     const router = useRouter();
-
     const { login } = useAuth();
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
 
-    function handleSubmit(
-        event: FormEvent<HTMLFormElement>
-    ) {
+    function handleSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
-
         setError("");
 
         const success = login(username, password);
@@ -32,48 +28,25 @@ export default function LoginPage() {
     }
 
     return (
-        <Box
-            sx={{
-                minHeight: "100vh",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "#f5f6f8",
-                px: 2,
-            }}
-        >
-            <Paper
-                elevation={0}
-                sx={{
-                    width: "100%",
-                    maxWidth: 400,
-                    p: 4,
-                    border: "1px solid #e5e7eb",
-                    borderRadius: 2,
-                }}
-            >
+        <div className="login-wrapper">
+            <div className="login-card">
                 <Typography
                     variant="h5"
-                    sx={{
-                        fontWeight:600,
-                        mb:1,
-                    }}
+                    component="h1"
+                    className="page-title"
                 >
                     Student Management
                 </Typography>
 
                 <Typography
                     variant="body2"
-                    color="text.secondary"
-                    sx={{mb:3,}}
+                    className="page-subtitle"
+                    sx={{ mb: 3 }}
                 >
                     Sign in to continue
                 </Typography>
 
-                <Box
-                    component="form"
-                    onSubmit={handleSubmit}
-                >
+                <form onSubmit={handleSubmit}>
                     <TextField
                         fullWidth
                         label="Username"
@@ -98,9 +71,8 @@ export default function LoginPage() {
 
                     {error && (
                         <Typography
-                            color="error"
+                            className="login-error"
                             variant="body2"
-                            sx={{ mt: 1 }}
                         >
                             {error}
                         </Typography>
@@ -110,12 +82,12 @@ export default function LoginPage() {
                         type="submit"
                         fullWidth
                         variant="contained"
-                        sx={{ mt: 3 }}
+                        sx={{ mt: 3, textTransform: "none" }}
                     >
                         Login
                     </Button>
-                </Box>
-            </Paper>
-        </Box>
+                </form>
+            </div>
+        </div>
     );
 }

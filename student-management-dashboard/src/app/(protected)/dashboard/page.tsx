@@ -1,10 +1,6 @@
 "use client";
 
-import {
-    Box,
-    Typography,
-} from "@mui/material";
-
+import { Button, Typography } from "@mui/material";
 import {
     Bar,
     BarChart,
@@ -16,7 +12,6 @@ import {
 } from "recharts";
 
 import { useStudents } from "@/hooks/useStudents";
-
 import StatCard from "@/components/StatCard/StatCard";
 import Loading from "@/components/Loading/Loading";
 
@@ -34,53 +29,48 @@ export default function DashboardPage() {
 
     if (error) {
         return (
-            <Box>
+            <div className="card">
                 <Typography
                     variant="h6"
+                    className="card-title"
                     sx={{ mb: 2 }}
                 >
                     Unable to load dashboard data.
                 </Typography>
 
-                <button onClick={loadStudents}>
+                <Button
+                    variant="contained"
+                    onClick={loadStudents}
+                    sx={{ textTransform: "none" }}
+                >
                     Retry
-                </button>
-            </Box>
+                </Button>
+            </div>
         );
     }
 
+    const totalStudents = students.length;
 
-    const totalStudents =
-        students.length;
+    const activeStudents = students.filter(
+        (student) => student.status === "Active"
+    ).length;
 
-    const activeStudents =
-        students.filter(
-            (student) =>student.status === "Active").length;
-
-    const completedStudents =
-        students.filter(
-            (student) =>
-                student.status === "Completed"
-        ).length;
+    const completedStudents = students.filter(
+        (student) => student.status === "Completed"
+    ).length;
 
     const averageScore =
         students.length === 0
             ? 0
             : students.reduce(
-                (sum, student) =>
-                    sum + Number(student.score),
-                0
-            ) / students.length;
+                  (sum, student) => sum + Number(student.score),
+                  0
+              ) / students.length;
 
-    const pendingAssignments =
-        students.reduce(
-            (sum, student) =>
-                sum +
-                Number(
-                    student.pendingAssignments
-                ),
-            0
-        );
+    const pendingAssignments = students.reduce(
+        (sum, student) => sum + Number(student.pendingAssignments),
+        0
+    );
 
     const scoreDistribution = [
         {
@@ -110,46 +100,21 @@ export default function DashboardPage() {
     ];
 
     return (
-        <Box>
+        <div>
             {/* Page Header */}
-
-            <Box sx={{ mb: 4 }}>
-                <Typography
-                    variant="h4"
-                    sx={{
-                        fontWeight: 600,
-                        color: "#111827",
-                        mb: 0.5,
-                    }}
-                >
-                    Dashboard
-                </Typography>
-
-                <Typography
-                    variant="body2"
-                    sx={{
-                        color: "#6b7280",
-                    }}
-                >
-                    Overview of student
-                    performance and activity.
-                </Typography>
-            </Box>
+            <div className="page-header">
+                <div>
+                    <h1 className="page-title">
+                        Dashboard
+                    </h1>
+                    <p className="page-subtitle">
+                        Overview of student performance and activity.
+                    </p>
+                </div>
+            </div>
 
             {/* Statistics */}
-
-            <Box
-                sx={{
-                    display: "grid",
-                    gridTemplateColumns: {
-                        xs: "1fr",
-                        sm: "repeat(2, 1fr)",
-                        lg: "repeat(3, 1fr)",
-                    },
-                    gap: 2,
-                    mb: 3,
-                }}
-            >
+            <div className="stat-grid">
                 <StatCard
                     title="Total Students"
                     value={totalStudents}
@@ -167,84 +132,44 @@ export default function DashboardPage() {
 
                 <StatCard
                     title="Average Score"
-                    value={`${averageScore.toFixed(
-                        1
-                    )}%`}
+                    value={`${averageScore.toFixed(1)}%`}
                 />
 
                 <StatCard
                     title="Pending Assignments"
                     value={pendingAssignments}
                 />
-            </Box>
+            </div>
 
             {/* Chart */}
-
-            <Box
-                sx={{
-                    backgroundColor: "#ffffff",
-                    border:
-                        "1px solid #e5e7eb",
-                    borderRadius: 2,
-                    p: 2.5,
-                }}
-            >
-                <Typography
-                    variant="h6"
-                    sx={{
-                        fontWeight: 600,
-                        mb: 0.5,
-                    }}
-                >
+            <div className="chart-card">
+                <h2 className="card-title">
                     Score Distribution
-                </Typography>
+                </h2>
 
-                <Typography
-                    variant="body2"
-                    sx={{
-                        color: "#6b7280",
-                        mb: 3,
-                    }}
-                >
-                    Number of students by
-                    score range.
-                </Typography>
+                <p className="card-subtitle">
+                    Number of students by score range.
+                </p>
 
-                <Box
-                    sx={{
-                        width: "100%",
-                        height: 320,
-                    }}
-                >
+                <div className="chart-container">
                     <ResponsiveContainer
                         width="100%"
                         height="100%"
                     >
-                        <BarChart
-                            data={scoreDistribution}
-                        >
-                            <CartesianGrid
-                                strokeDasharray="3 3"
-                            />
-
-                            <XAxis
-                                dataKey="range"
-                            />
-
-                            <YAxis
-                                allowDecimals={false}
-                            />
-
+                        <BarChart data={scoreDistribution}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="range" />
+                            <YAxis allowDecimals={false} />
                             <Tooltip />
-
                             <Bar
                                 dataKey="count"
                                 name="Students"
+                                fill="#1976d2"
                             />
                         </BarChart>
                     </ResponsiveContainer>
-                </Box>
-            </Box>
-        </Box>
+                </div>
+            </div>
+        </div>
     );
 }

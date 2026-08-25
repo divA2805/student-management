@@ -1,7 +1,7 @@
 export default function Loading() {
-  return (
-    <div>
-      <p>Loading students...</p>
-    </div>
-  );
+    return (
+        <div className="loading-container">
+            <p>Loading students...</p>
+        </div>
+    );
 }

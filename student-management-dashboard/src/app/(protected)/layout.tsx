@@ -2,10 +2,8 @@
 
 import { ReactNode, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Box } from "@mui/material";
 
 import { useAuth } from "@/context/AuthContext";
-
 import Header from "@/components/Header/Header";
 import Sidebar from "@/components/Sidebar/Sidebar";
 
@@ -15,21 +13,13 @@ export default function ProtectedLayout({
     children: ReactNode;
 }) {
     const router = useRouter();
-
-    const {
-        isAuthenticated,
-        loading,
-    } = useAuth();
+    const { isAuthenticated, loading } = useAuth();
 
     useEffect(() => {
         if (!loading && !isAuthenticated) {
             router.replace("/login");
         }
-    }, [
-        loading,
-        isAuthenticated,
-        router,
-    ]);
+    }, [loading, isAuthenticated, router]);
 
     if (loading) {
         return null;
@@ -40,36 +30,16 @@ export default function ProtectedLayout({
     }
 
     return (
-        <Box
-            sx={{
-                minHeight: "100vh",
-                backgroundColor: "#f5f6f8",
-            }}
-        >
+        <div className="app-shell">
             <Header />
 
-            <Box
-                sx={{
-                    display: "flex",
-                    minHeight: "calc(100vh - 64px)",
-                }}
-            >
+            <div className="app-body">
                 <Sidebar />
 
-                <Box
-                    component="main"
-                    sx={{
-                        flex: 1,
-                        minWidth: 0,
-                        p: {
-                            xs: 2,
-                            md: 3,
-                        },
-                    }}
-                >
+                <main className="app-main">
                     {children}
-                </Box>
-            </Box>
-        </Box>
+                </main>
+            </div>
+        </div>
     );
 }

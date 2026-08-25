@@ -11,25 +11,16 @@ import {
     Tooltip,
 } from "@mui/material";
 
-import VisibilityOutlinedIcon
-    from "@mui/icons-material/VisibilityOutlined";
-
-import EditOutlinedIcon
-    from "@mui/icons-material/EditOutlined";
-
-import { DeleteOutlined } from '@mui/icons-material';
-
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import { DeleteOutlined } from "@mui/icons-material";
 
 import { useRouter } from "next/navigation";
-
 import { Student } from "@/types/student";
 
 interface StudentTableProps {
     students: Student[];
-
-    onDelete?: (
-        student: Student
-    ) => void;
+    onDelete?: (student: Student) => void;
 }
 
 export default function StudentTable({
@@ -44,75 +35,62 @@ export default function StudentTable({
             headerName: "Name",
             flex: 1.2,
             minWidth: 180,
-            valueGetter: (
-                _value,
-                row
-            ) =>
+            valueGetter: (_value, row) =>
                 `${row.firstName} ${row.lastName}`,
         },
-
         {
             field: "email",
             headerName: "Email",
             flex: 1.5,
             minWidth: 220,
         },
-
         {
             field: "course",
             headerName: "Course",
             flex: 1,
             minWidth: 130,
         },
-
         {
             field: "status",
             headerName: "Status",
             flex: 0.8,
             minWidth: 110,
         },
-
         {
             field: "score",
             headerName: "Score",
             flex: 0.6,
             minWidth: 90,
         },
-
         {
             field: "pendingAssignments",
-            headerName:
-                "Pending Assignments",
+            headerName: "Pending Assignments",
             flex: 0.9,
             minWidth: 160,
         },
-
         {
             field: "actions",
             headerName: "Actions",
             sortable: false,
             filterable: false,
             width: 150,
-
             renderCell: (params) => (
                 <Box
                     sx={{
                         display: "flex",
                         gap: 0.5,
+                        alignItems: "center",
+                        height: "100%",
                     }}
                 >
                     <Tooltip title="View">
                         <IconButton
                             size="small"
                             onClick={() =>
-                                router.push(
-                                    `/students/${params.row.id}`
-                                )
+                                router.push(`/students/${params.row.id}`)
                             }
                         >
-                            <VisibilityOutlinedIcon
-                                fontSize="small"
-                            />
+                            <VisibilityOutlinedIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
 
@@ -120,14 +98,10 @@ export default function StudentTable({
                         <IconButton
                             size="small"
                             onClick={() =>
-                                router.push(
-                                    `/students/${params.row.id}/edit`
-                                )
+                                router.push(`/students/${params.row.id}/edit`)
                             }
                         >
-                            <EditOutlinedIcon
-                                fontSize="small"
-                            />
+                            <EditOutlinedIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
 
@@ -135,14 +109,10 @@ export default function StudentTable({
                         <IconButton
                             size="small"
                             onClick={() =>
-                                onDelete?.(
-                                    params.row
-                                )
+                                onDelete?.(params.row)
                             }
                         >
-                            <DeleteOutlined
-                                fontSize="small"
-                            />
+                            <DeleteOutlined fontSize="small" />
                         </IconButton>
                     </Tooltip>
                 </Box>
@@ -151,28 +121,14 @@ export default function StudentTable({
     ];
 
     return (
-        <Box
-            sx={{
-                width: "100%",
-                backgroundColor:
-                    "#ffffff",
-                border:
-                    "1px solid #e5e7eb",
-                borderRadius: 2,
-                overflow: "hidden",
-            }}
-        >
+        <div className="table-container">
             <DataGrid
                 rows={students}
                 columns={columns}
                 getRowId={(row) => row.id}
                 disableRowSelectionOnClick
                 autoHeight
-                pageSizeOptions={[
-                    5,
-                    10,
-                    25,
-                ]}
+                pageSizeOptions={[5, 10, 25]}
                 initialState={{
                     pagination: {
                         paginationModel: {
@@ -183,19 +139,14 @@ export default function StudentTable({
                 }}
                 sx={{
                     border: 0,
-
-                    "& .MuiDataGrid-columnHeaders":
-                        {
-                            backgroundColor:
-                                "#fafafa",
-                        },
-
-                    "& .MuiDataGrid-columnHeaderTitle":
-                        {
-                            fontWeight: 600,
-                        },
+                    "& .MuiDataGrid-columnHeaders": {
+                        backgroundColor: "var(--surface-subtle)",
+                    },
+                    "& .MuiDataGrid-columnHeaderTitle": {
+                        fontWeight: 600,
+                    },
                 }}
             />
-        </Box>
+        </div>
     );
 }

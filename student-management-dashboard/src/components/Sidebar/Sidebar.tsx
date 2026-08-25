@@ -1,9 +1,7 @@
 "use client";
 
 import Link from "next/link";
-
 import {
-    Box,
     List,
     ListItemButton,
     ListItemText,
@@ -11,20 +9,7 @@ import {
 
 export default function Sidebar() {
     return (
-        <Box
-            component="aside"
-            sx={{
-                width: 220,
-                flexShrink: 0,
-                backgroundColor: "#ffffff",
-                borderRight:
-                    "1px solid #e5e7eb",
-                display: {
-                    xs: "none",
-                    md: "block",
-                },
-            }}
-        >
+        <aside className="app-sidebar">
             <List sx={{ p: 1.5 }}>
                 <ListItemButton
                     component={Link}
@@ -34,9 +19,7 @@ export default function Sidebar() {
                         mb: 0.5,
                     }}
                 >
-                    <ListItemText
-                        primary="Dashboard"
-                    />
+                    <ListItemText primary="Dashboard" />
                 </ListItemButton>
 
                 <ListItemButton
@@ -46,11 +29,9 @@ export default function Sidebar() {
                         borderRadius: 1,
                     }}
                 >
-                    <ListItemText
-                        primary="Students"
-                    />
+                    <ListItemText primary="Students" />
                 </ListItemButton>
             </List>
-        </Box>
+        </aside>
     );
 }
