@@ -1,13 +1,6 @@
 "use client";
 
-import {
-    Button,
-    FormControl,
-    InputLabel,
-    MenuItem,
-    Select,
-    TextField,
-} from "@mui/material";
+import {Button,FormControl,InputLabel,MenuItem,Select,TextField} from "@mui/material";
 
 import { Student } from "@/types/student";
 

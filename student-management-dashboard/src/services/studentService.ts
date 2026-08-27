@@ -32,22 +32,16 @@ export async function getStudentById(
     );
 }
 
-export async function createStudent(
-    data: StudentInput
-): Promise<Student> {
+export async function createStudent(data: StudentInput): Promise<Student> {
     const students = await getStudents();
 
     const newStudent: Student = {
-        id: Date.now(),
-        ...data,
+        id: Date.now(),...data,
     };
 
     students.push(newStudent);
 
-    localStorage.setItem(
-        key,
-        JSON.stringify(students)
-    );
+    localStorage.setItem(key,JSON.stringify(students));
 
     return newStudent;
 }
@@ -86,21 +80,13 @@ export async function updateStudent(
     return updatedStudent;
 }
 
-export async function deleteStudent(
-    id: number
-): Promise<void> {
+export async function deleteStudent(id: number): Promise<void> {
     const students = await getStudents();
 
     const remainingStudents =
-        students.filter(
-            (student) =>
+        students.filter((student) =>
                 student.id !== id
         );
 
-    localStorage.setItem(
-        key,
-        JSON.stringify(
-            remainingStudents
-        )
-    );
+    localStorage.setItem(key,JSON.stringify(remainingStudents));
 }
