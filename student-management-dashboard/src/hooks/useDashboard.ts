@@ -21,46 +21,41 @@ export function useDashboard() {
     ).length;
 
     const averageScore =
-        students.length === 0
+        totalStudents === 0
             ? 0
             : students.reduce(
                   (sum, student) =>
-                      sum + Number(student.score),
+                      sum + (Number(student.score) || 0),
                   0
-              ) / students.length;
+              ) / totalStudents;
 
-    const pendingAssignments =
-        students.reduce(
-            (sum, student) =>
-                sum +
-                Number(student.pendingAssignments),
-            0
-        );
+    const pendingAssignments = students.reduce(
+        (sum, student) =>
+            sum + (Number(student.pendingAssignments) || 0),
+        0
+    );
 
     const scoreDistribution = [
         {
             range: "0-50",
-            count: students.filter(
-                (student) =>
-                    Number(student.score) >= 0 &&
-                    Number(student.score) <= 50
-            ).length,
+            count: students.filter((student) => {
+                const score = Number(student.score) || 0;
+                return score >= 0 && score <= 50;
+            }).length,
         },
         {
             range: "51-75",
-            count: students.filter(
-                (student) =>
-                    Number(student.score) >= 51 &&
-                    Number(student.score) <= 75
-            ).length,
+            count: students.filter((student) => {
+                const score = Number(student.score) || 0;
+                return score >= 51 && score <= 75;
+            }).length,
         },
         {
             range: "76-100",
-            count: students.filter(
-                (student) =>
-                    Number(student.score) >= 76 &&
-                    Number(student.score) <= 100
-            ).length,
+            count: students.filter((student) => {
+                const score = Number(student.score) || 0;
+                return score >= 76 && score <= 100;
+            }).length,
         },
     ];
 
