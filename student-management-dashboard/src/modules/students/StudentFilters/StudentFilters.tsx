@@ -1,6 +1,13 @@
 "use client";
 
-import {Button,FormControl,InputLabel,MenuItem,Select,TextField} from "@mui/material";
+import {
+    Button,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select,
+    TextField,
+} from "@mui/material";
 
 import { Student } from "@/types/student";
 
@@ -10,6 +17,7 @@ interface StudentFiltersProps {
     course: string;
     status: string;
     scoreRange: string;
+    availableCourses?: string[];
     onSearchChange: (value: string) => void;
     onCourseChange: (value: string) => void;
     onStatusChange: (value: string) => void;
@@ -24,6 +32,7 @@ export default function StudentFilters({
     course,
     status,
     scoreRange,
+    availableCourses,
     onSearchChange,
     onCourseChange,
     onStatusChange,
@@ -31,9 +40,15 @@ export default function StudentFilters({
     onApply,
     onReset,
 }: StudentFiltersProps) {
-    const courses = Array.from(
-        new Set(students.map((student) => student.course))
-    );
+    const courses =
+        availableCourses ||
+        Array.from(
+            new Set(
+                students
+                    .map((student) => student.course)
+                    .filter((c): c is string => Boolean(c && c.trim()))
+            )
+        );
 
     return (
         <div className="filter-card">
@@ -62,14 +77,9 @@ export default function StudentFilters({
                             onCourseChange(event.target.value)
                         }
                     >
-                        <MenuItem value="">
-                            All Courses
-                        </MenuItem>
+                        <MenuItem value="">All Courses</MenuItem>
                         {courses.map((courseName) => (
-                            <MenuItem
-                                key={courseName}
-                                value={courseName}
-                            >
+                            <MenuItem key={courseName} value={courseName}>
                                 {courseName}
                             </MenuItem>
                         ))}
@@ -86,18 +96,10 @@ export default function StudentFilters({
                             onStatusChange(event.target.value)
                         }
                     >
-                        <MenuItem value="">
-                            All Statuses
-                        </MenuItem>
-                        <MenuItem value="Active">
-                            Active
-                        </MenuItem>
-                        <MenuItem value="Completed">
-                            Completed
-                        </MenuItem>
-                        <MenuItem value="Inactive">
-                            Inactive
-                        </MenuItem>
+                        <MenuItem value="">All</MenuItem>
+                        <MenuItem value="Active">Active</MenuItem>
+                        <MenuItem value="Completed">Completed</MenuItem>
+                        <MenuItem value="Inactive">Inactive</MenuItem>
                     </Select>
                 </FormControl>
 
@@ -111,18 +113,10 @@ export default function StudentFilters({
                             onScoreRangeChange(event.target.value)
                         }
                     >
-                        <MenuItem value="">
-                            All Scores
-                        </MenuItem>
-                        <MenuItem value="0-50">
-                            0 - 50
-                        </MenuItem>
-                        <MenuItem value="51-75">
-                            51 - 75
-                        </MenuItem>
-                        <MenuItem value="76-100">
-                            76 - 100
-                        </MenuItem>
+                        <MenuItem value="">All Scores</MenuItem>
+                        <MenuItem value="0-50">0 - 50</MenuItem>
+                        <MenuItem value="51-75">51 - 75</MenuItem>
+                        <MenuItem value="76-100">76 - 100</MenuItem>
                     </Select>
                 </FormControl>
             </div>

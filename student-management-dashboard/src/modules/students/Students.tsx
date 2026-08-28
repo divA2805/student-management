@@ -1,16 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 
 import StudentTable from "./StudentTable/StudentTable";
 import StudentFilters from "./StudentFilters/StudentFilters";
-
 import Loading from "@/components/Loading/Loading";
 import ConfirmDialog from "@/components/ConfirmDialog/ConfirmDialog";
 
 import { useStudents } from "@/hooks/useStudents";
+import { useStudentFilters } from "@/hooks/useStudentFilters";
 import { Student } from "@/types/student";
 
 export default function Students() {
@@ -24,120 +24,24 @@ export default function Students() {
         deleteStudent,
     } = useStudents();
 
-    const [search, setSearch] = useState("");
-    const [course, setCourse] = useState("");
-    const [status, setStatus] = useState("");
-    const [scoreRange, setScoreRange] = useState("");
+    const {
+        search,
+        setSearch,
+        course,
+        setCourse,
+        status,
+        setStatus,
+        scoreRange,
+        setScoreRange,
+        filteredStudents,
+        availableCourses,
+        applyFilters,
+        resetFilters,
+    } = useStudentFilters(students);
 
     const [studentToDelete, setStudentToDelete] =
         useState<Student | null>(null);
-
-    const [appliedFilters, setAppliedFilters] =
-        useState({
-            search: "",
-            course: "",
-            status: "",
-            scoreRange: "",
-        });
-
-    // Debounced search
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            setAppliedFilters((prev) => ({
-                ...prev,
-                search,
-            }));
-        }, 300);
-
-        return () => clearTimeout(timer);
-    }, [search]);
-
-    // Filtering
-    const filteredStudents = students.filter(
-        (student: Student) => {
-            const searchText =
-                appliedFilters.search
-                    .toLowerCase()
-                    .trim();
-
-            const fullName =
-                `${student.firstName} ${student.lastName}`
-                    .toLowerCase();
-
-            const email =
-                student.email.toLowerCase();
-
-            const matchesSearch =
-                !searchText ||
-                fullName.includes(searchText) ||
-                email.includes(searchText);
-
-            const matchesCourse =
-                !appliedFilters.course ||
-                student.course ===
-                    appliedFilters.course;
-
-            const matchesStatus =
-                !appliedFilters.status ||
-                student.status ===
-                    appliedFilters.status;
-
-            let matchesScore = true;
-
-            if (
-                appliedFilters.scoreRange ===
-                "0-50"
-            ) {
-                matchesScore =
-                    student.score >= 0 &&
-                    student.score <= 50;
-            } else if (
-                appliedFilters.scoreRange ===
-                "51-75"
-            ) {
-                matchesScore =
-                    student.score >= 51 &&
-                    student.score <= 75;
-            } else if (
-                appliedFilters.scoreRange ===
-                "76-100"
-            ) {
-                matchesScore =
-                    student.score >= 76 &&
-                    student.score <= 100;
-            }
-
-            return (
-                matchesSearch &&
-                matchesCourse &&
-                matchesStatus &&
-                matchesScore
-            );
-        }
-    );
-
-    function handleApplyFilters() {
-        setAppliedFilters({
-            search,
-            course,
-            status,
-            scoreRange,
-        });
-    }
-
-    function handleReset() {
-        setSearch("");
-        setCourse("");
-        setStatus("");
-        setScoreRange("");
-
-        setAppliedFilters({
-            search: "",
-            course: "",
-            status: "",
-            scoreRange: "",
-        });
-    }
+    const [deleteError, setDeleteError] = useState<string | null>(null);
 
     async function handleDelete() {
         if (!studentToDelete) {
@@ -145,13 +49,12 @@ export default function Students() {
         }
 
         try {
-            await deleteStudent(
-                studentToDelete.id
-            );
-
+            setDeleteError(null);
+            await deleteStudent(studentToDelete.id);
             setStudentToDelete(null);
-        } catch (error) {
-            console.error(error);
+        } catch (err) {
+            setDeleteError("Failed to delete student. Please try again.");
+            console.error(err);
         }
     }
 
@@ -188,57 +91,42 @@ export default function Students() {
             {/* Header */}
             <div className="page-header">
                 <div>
-                    <h1 className="page-title">
-                        Students
-                    </h1>
-
+                    <h1 className="page-title">Students</h1>
                     <p className="page-subtitle">
-                        Manage student records
-                        and performance.
+                        Manage student records and performance.
                     </p>
                 </div>
 
                 <div className="page-actions">
                     <Button
                         variant="contained"
-                        onClick={() =>
-                            router.push(
-                                "/students/add"
-                            )
-                        }
-                        sx={{
-                            textTransform:
-                                "none",
-                        }}
+                        onClick={() => router.push("/students/add")}
+                        sx={{ textTransform: "none" }}
                     >
                         Add Student
                     </Button>
                 </div>
             </div>
 
-            {/* Empty State */}
+            {deleteError && (
+                <div className="card" style={{ marginBottom: "16px" }}>
+                    <Typography color="error" variant="body2">
+                        {deleteError}
+                    </Typography>
+                </div>
+            )}
+
+            {/* Empty State: Case 1 - No students exist at all */}
             {students.length === 0 ? (
                 <div className="empty-state">
-                    <h2 className="empty-state-title">
-                        No students found
-                    </h2>
-
+                    <h2 className="empty-state-title">No students found</h2>
                     <p className="empty-state-subtitle">
-                        Add your first student
-                        to get started.
+                        Add your first student to get started.
                     </p>
-
                     <Button
                         variant="contained"
-                        onClick={() =>
-                            router.push(
-                                "/students/add"
-                            )
-                        }
-                        sx={{
-                            textTransform:
-                                "none",
-                        }}
+                        onClick={() => router.push("/students/add")}
+                        sx={{ textTransform: "none" }}
                     >
                         Add Student
                     </Button>
@@ -251,62 +139,56 @@ export default function Students() {
                         course={course}
                         status={status}
                         scoreRange={scoreRange}
-                        onSearchChange={
-                            setSearch
-                        }
-                        onCourseChange={
-                            setCourse
-                        }
-                        onStatusChange={
-                            setStatus
-                        }
-                        onScoreRangeChange={
-                            setScoreRange
-                        }
-                        onApply={
-                            handleApplyFilters
-                        }
-                        onReset={
-                            handleReset
-                        }
+                        availableCourses={availableCourses}
+                        onSearchChange={setSearch}
+                        onCourseChange={setCourse}
+                        onStatusChange={setStatus}
+                        onScoreRangeChange={setScoreRange}
+                        onApply={applyFilters}
+                        onReset={resetFilters}
                     />
 
                     <p className="results-info">
-                        Showing{" "}
-                        {filteredStudents.length}{" "}
-                        of {students.length}{" "}
-                        students
+                        Showing {filteredStudents.length} of {students.length} students
                     </p>
 
-                    <StudentTable
-                        students={
-                            filteredStudents
-                        }
-                        onDelete={(student) =>
-                            setStudentToDelete(
-                                student
-                            )
-                        }
-                    />
+                    {/* Empty State: Case 2 - Filters return zero results */}
+                    {filteredStudents.length === 0 ? (
+                        <div className="empty-state">
+                            <h2 className="empty-state-title">
+                                No students match your filters.
+                            </h2>
+                            <p className="empty-state-subtitle">
+                                Try adjusting or resetting your search and filter criteria.
+                            </p>
+                            <Button
+                                variant="outlined"
+                                onClick={resetFilters}
+                                sx={{ textTransform: "none" }}
+                            >
+                                Reset Filters
+                            </Button>
+                        </div>
+                    ) : (
+                        /* Case 3: Display filtered students in DataGrid */
+                        <StudentTable
+                            students={filteredStudents}
+                            onDelete={(student) => setStudentToDelete(student)}
+                        />
+                    )}
                 </>
             )}
 
             <ConfirmDialog
-                open={Boolean(
-                    studentToDelete
-                )}
+                open={Boolean(studentToDelete)}
                 title="Delete Student"
                 message={
                     studentToDelete
                         ? `Are you sure you want to delete ${studentToDelete.firstName} ${studentToDelete.lastName}?`
                         : ""
                 }
-                onCancel={() =>
-                    setStudentToDelete(null)
-                }
-                onConfirm={
-                    handleDelete
-                }
+                onCancel={() => setStudentToDelete(null)}
+                onConfirm={handleDelete}
             />
         </div>
     );
