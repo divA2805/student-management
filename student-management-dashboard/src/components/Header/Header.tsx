@@ -13,12 +13,17 @@ import { useAuth } from "@/context/AuthContext";
 
 export default function Header() {
     const router = useRouter();
-    const { username, logout } = useAuth();
+    const { user, logout } = useAuth();
 
     function handleLogout() {
         logout();
         router.replace("/login");
     }
+
+    const displayName =
+        user?.role === "admin"
+            ? "Admin"
+            : user?.username || user?.email || "User";
 
     return (
         <AppBar
@@ -47,7 +52,7 @@ export default function Header() {
                     color="text.secondary"
                     sx={{ mr: 2 }}
                 >
-                    {username || "Admin"}
+                    {displayName}
                 </Typography>
 
                 <Button

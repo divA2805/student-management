@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import Header from "@/components/Header/Header";
 import Sidebar from "@/components/Sidebar/Sidebar";
+import Loading from "@/components/Loading/Loading";
 
 export default function ProtectedLayout({
     children,
@@ -13,16 +14,16 @@ export default function ProtectedLayout({
     children: ReactNode;
 }) {
     const router = useRouter();
-    const { isAuthenticated, loading } = useAuth();
+    const { isAuthenticated, isLoading } = useAuth();
 
     useEffect(() => {
-        if (!loading && !isAuthenticated) {
+        if (!isLoading && !isAuthenticated) {
             router.replace("/login");
         }
-    }, [loading, isAuthenticated, router]);
+    }, [isLoading, isAuthenticated, router]);
 
-    if (loading) {
-        return null;
+    if (isLoading) {
+        return <Loading />;
     }
 
     if (!isAuthenticated) {
